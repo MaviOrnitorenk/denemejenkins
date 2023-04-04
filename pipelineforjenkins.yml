@@ -1,0 +1,28 @@
+pipeline:
+  agent:
+    any
+  stages:
+    - stage: Checkout
+      steps:
+        - name: Checkout repository
+          checkout: git://github.com/MaviOrnitorenk/denemejenkins.git
+    - stage: Build
+      steps:
+        - name: Setup .NET Core SDK
+          shell: powershell
+          command: |
+            choco install dotnetcore-sdk --version=6.0.100-preview.7.21379.14 -y
+        - name: Restore NuGet packages
+          shell: powershell
+          command: |
+            dotnet restore
+        - name: Build project
+          shell: powershell
+          command: |
+            dotnet build --configuration Release
+        - name: Publish project
+          shell: powershell
+          command: |
+            dotnet publish --configuration Release --output ./publish
+        - name: Upload artifact
+          archiveArtifacts: ./publish/**/*
